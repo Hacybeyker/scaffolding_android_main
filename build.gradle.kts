@@ -4,13 +4,14 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven { setUrl("https://jitpack.io") }
-        /*maven {
+        maven {
             setUrl(ConfigureApp.urlRepoDependencies)
+            isAllowInsecureProtocol = true
             credentials {
                 username = findProperty("REPO_USERID") as String? ?: System.getenv("REPO_USERID")
                 password = findProperty("REPO_TOKEN") as String? ?: System.getenv("REPO_TOKEN")
             }
-        }*/
+        }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.0.3")
@@ -26,13 +27,14 @@ allprojects {
         mavenCentral()
         mavenLocal()
         maven { setUrl("https://jitpack.io") }
-        /*maven {
+        maven {
             setUrl(ConfigureApp.urlRepoDependencies)
+            isAllowInsecureProtocol = true
             credentials {
                 username = findProperty("REPO_USERID") as String? ?: System.getenv("REPO_USERID")
                 password = findProperty("REPO_TOKEN") as String? ?: System.getenv("REPO_TOKEN")
             }
-        }*/
+        }
     }
 }
 

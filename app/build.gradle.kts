@@ -5,8 +5,10 @@ plugins {
     id("kotlin-parcelize")
 }
 
-apply(from = "sonarqube.gradle")
-apply(from = "jacoco.gradle")
+apply {
+    from("sonarqube.gradle")
+    from("jacoco.gradle")
+}
 
 android {
     compileSdk = VersionApp.compileSdkVersion
