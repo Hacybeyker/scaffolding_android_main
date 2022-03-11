@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name" translatable="false">scaffolding_android_main</string>
+    <string name="hello_world">Hola Mundo!</string>
+</resources>

@@ -28,7 +28,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Lint
-        run: ./gradlew module:lintDebug
+        run: ./gradlew app:lintDebug
 
       - name: Upload Lint Test Report
         uses: actions/upload-artifact@v2
@@ -36,8 +36,23 @@ jobs:
           name: lint_report
           path: module/build/reports/lint-results-debug.html
 
+      - name: Run KtLintFormat
+        run: ./gradlew app:ktlintFormat
+
+      - name: Run KtLintCheck
+        run: ./gradlew app:ktlintCheck
+
+      - name: Run Detekt
+        run: ./gradlew app:detekt
+
+      - name: Upload Detekt Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: detekt_report
+          path: module/build/reports/detekt
+
       - name: Run Tests
-        run: ./gradlew module:testDebugUnitTest
+        run: ./gradlew app:testDebugUnitTest
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v2
@@ -46,7 +61,7 @@ jobs:
           path: module/build/reports/tests/testDebugUnitTest/
 
       - name: Run Jacoco Test Report
-        run: ./gradlew module:jacocoTestReport
+        run: ./gradlew app:jacocoTestReport
 
       - name: Upload Coverage Test Report
         uses: actions/upload-artifact@v2
@@ -55,9 +70,9 @@ jobs:
           path: module/build/reports/jacoco/jacocoTestReport/
 
       - name: Run Jacoco Test Coverage Verification
-        run: ./gradlew module:jacocoTestCoverageVerification
+        run: ./gradlew app:jacocoTestCoverageVerification
 
       - name: Run SonarQube Scan
-        run: ./gradlew module:sonarqube -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.login=${{ secrets.SONARCLOUDTOKEN }}
+        run: ./gradlew app:sonarqube -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.login=${{ secrets.SONARCLOUDTOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
