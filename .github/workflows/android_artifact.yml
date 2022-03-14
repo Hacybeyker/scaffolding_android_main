@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: lint_report
-          path: module/build/reports/lint-results-debug.html
+          path: app/build/reports/lint-results-debug.html
 
       - name: Run KtLintFormat
         run: ./gradlew app:ktlintFormat
@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: detekt_report
-          path: module/build/reports/detekt
+          path: app/build/reports/detekt
 
       - name: Run Tests
         run: ./gradlew app:testDebugUnitTest
@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: unit_test_report
-          path: module/build/reports/tests/testDebugUnitTest/
+          path: app/build/reports/tests/testDebugUnitTest/
 
       - name: Run Jacoco Test Report
         run: ./gradlew app:jacocoTestReport
@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jacoco_test_report
-          path: module/build/reports/jacoco/jacocoTestReport/
+          path: app/build/reports/jacoco/jacocoTestReport/
 
       - name: Run Jacoco Test Coverage Verification
         run: ./gradlew app:jacocoTestCoverageVerification
