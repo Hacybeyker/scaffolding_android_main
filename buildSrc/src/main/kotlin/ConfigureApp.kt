@@ -8,5 +8,5 @@ object ConfigureApp {
     //TODO change applicationId with your module name [APP]
     const val applicationId = "com.hacybeyker.main"
     const val versionCode = 1
-    const val version = "1.0.0"
+    const val versionName = "1.0.0"
 }

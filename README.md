@@ -13,7 +13,38 @@ git submodule update
 
 ## Tools
 
-- kotlin
+### Project
+- Kotlin
+- Hilt
+- Mockito
+- Coroutines
+- Retrofit
+- Glide
+
+### Support
+- Lint
+- Detekt
+- Ktlint
+- Chucker
+
+### CI/CD
+- Github Actions
+- SonarCloud
+
+
+## Service
+- [Google Play]()
+- [Github Actions]()
+- [SonarCloud]()
+- [MAD]()
+
+
+## Apis
+
+For this project was used api ...
+
+## Images
+
 
 
 ## License

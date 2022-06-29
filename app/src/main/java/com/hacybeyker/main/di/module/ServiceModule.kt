@@ -8,5 +8,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 class ServiceModule {
 
-    //TODO create your service
+    // TODO create your service
 }

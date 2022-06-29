@@ -20,8 +20,8 @@ class MainActivityTestRobolectric {
     fun showActivityDefault() {
         activityScenarioRule.scenario.moveToState(Lifecycle.State.RESUMED)
         activityScenarioRule.scenario.onActivity { activity ->
-            val algo = activity.findViewById<TextView>(R.id.tvMessage)
-            Assert.assertEquals(algo.text, activity.resources.getString(R.string.hello_world))
+            val message = activity.findViewById<TextView>(R.id.tvMessage)
+            Assert.assertEquals(message.text, activity.resources.getString(R.string.hello_world))
         }
     }
 }

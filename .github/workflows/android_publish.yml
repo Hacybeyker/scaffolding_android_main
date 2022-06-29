@@ -1,9 +1,11 @@
-name: Android Deploy
+name: Android Publish
 
-on:
-  push:
-    branches:
-      - 'develop'
+on: [ workflow_dispatch ]
+#TODO Change for this
+#on:
+  #push:
+    #branches:
+      #- 'master'
 
 jobs:
   lint:
@@ -63,6 +65,9 @@ jobs:
           name: unit_test_report
           path: app/build/reports/tests/testDebugUnitTest/
 
+      - name: Run Jacoco Test Report
+        run: ./gradlew app:jacocoTestReport
+
       - name: Upload Coverage Test Report
         uses: actions/upload-artifact@v2
         with:
@@ -77,13 +82,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  artifact:
-    name: Artifact
+  publish:
+    name: Publish
     needs: [ code-analysis ]
     runs-on: ubuntu-latest
     env:
       REPO_USERID: ${{ secrets.REPO_USERID }}
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+      SIGNING_KEY_ALIAS_MOVIEOH: ${{ secrets.SIGNING_KEY_ALIAS_MOVIEOH }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -91,11 +99,36 @@ jobs:
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
 
-      - name: Run AssembleQA
-        run: ./gradlew app:assembleQA
+      - name: Signing App Release
+        run: |
+          ./gradlew app:bundleRelease
+          ./gradlew app:assembleRelease
 
-      - name: Upload Artifact APK
+      - name: Upload Artifact APK Release
         uses: actions/upload-artifact@v2
         with:
-          name: apk-qa
-          path: ./app/build/outputs/apk/qa
+          name: apk-release
+          path: ./app/build/outputs/apk/release
+
+      - name: Upload Artifact Bundle Release
+        uses: actions/upload-artifact@v2
+        with:
+          name: apk-bundle-release
+          path: ./app/build/outputs/bundle/release
+
+      - name: Create Tag Release
+        run: |
+          currentVersion=`grep versionName ./buildSrc/src/main/kotlin/ConfigureApp.kt | awk -F" " '{ print $5 }' `
+          currentFormattedVersion=`echo $currentVersion | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+          echo "Version: $currentFormattedVersion"
+          git tag $currentFormattedVersion
+          git push origin --tags
+
+      - name: Deploy to Alpha
+        uses: r0adkll/upload-google-play@v1.0.17
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SIGNING_SERVICE_ACCOUNT }}
+          #TODO change for your packageName
+          packageName: com.hacybeyker.movieoh
+          releaseFiles: ./app/build/outputs/bundle/release/app-release.aab
+          track: alpha

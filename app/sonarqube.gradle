@@ -1,26 +1,12 @@
 apply plugin: "org.sonarqube"
+apply { from("filter.gradle") }
 
 sonarqube {
     version = "3.3"
 }
 
 android {
-    def fileFilter = [
-            '*/$ViewInjector*.*',
-            '*/$ViewBinder*.*',
-            '**/R.class',
-            '*/R$.class',
-            '**/R2.class',
-            '*/R2$.class',
-            '*/BuildConfig.',
-            '*/Manifest.*',
-            '*/*Test.*',
-            'android/*/.*',
-            '*/_ViewBinding*.*',
-            '*/_Factory.*',
-            '*/_MembersInjector.*',
-            '*/$$Parcelable*.*'
-    ]
+    def fileFilter = getMyFilter()
 
     sonarqube {
         properties {
@@ -28,7 +14,7 @@ android {
             property("sonar.organization", ConfigureApp.organization)
             property("sonar.projectName", ConfigureApp.projectName)
             property("sonar.projectDescription", "This project is $ConfigureApp.projectName")
-            property("sonar.projectVersion", ConfigureApp.version)
+            property("sonar.projectVersion", ConfigureApp.versionName)
             property("sonar.projectBaseDir", "${projectDir.absolutePath}")
             property("sonar.sources", "./src/main/")
             property("sonar.sourceEncoding", "UTF-8")
