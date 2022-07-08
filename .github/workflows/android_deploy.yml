@@ -5,13 +5,16 @@ on:
     branches:
       - 'develop'
 
+env:
+  REPO_USERID: ${{ secrets.REPO_USERID }}
+  REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+  LOCAL_PROPERTIES_KEY_PROD: ${{ secrets.LOCAL_PROPERTIES_KEY_PROD }}
+  LOCAL_PROPERTIES_KEY_QA: ${{ secrets.LOCAL_PROPERTIES_KEY_QA }}
+
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -19,20 +22,19 @@ jobs:
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
 
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
+
       - name: Run Lint
-        run: ./gradlew app:lintDebug
+        uses: ./.github/workflows/actions/lint
 
       - name: Upload Lint Test Report
         uses: actions/upload-artifact@v2
         with:
           name: lint_report
           path: app/build/reports/lint-results-debug.html
-
-      - name: Run KtLintCheck
-        run: ./gradlew app:ktlintCheck
-
-      - name: Run Detekt
-        run: ./gradlew app:detekt
 
       - name: Upload Detekt Report
         uses: actions/upload-artifact@v2
@@ -44,15 +46,20 @@ jobs:
     name: Code Analysis
     needs: [ lint ]
     runs-on: ubuntu-latest
-    env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
+
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
+
+      - name: Run Lint
+        uses: ./.github/workflows/actions/lint
 
       - name: Run Tests
         run: ./gradlew app:testDebugUnitTest
@@ -62,6 +69,9 @@ jobs:
         with:
           name: unit_test_report
           path: app/build/reports/tests/testDebugUnitTest/
+
+      - name: Run Jacoco Test Report
+        run: ./gradlew app:jacocoTestReport
 
       - name: Upload Coverage Test Report
         uses: actions/upload-artifact@v2
@@ -81,9 +91,6 @@ jobs:
     name: Artifact
     needs: [ code-analysis ]
     runs-on: ubuntu-latest
-    env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -91,8 +98,13 @@ jobs:
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
 
-      - name: Run AssembleQA
-        run: ./gradlew app:assembleQA
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
+
+      - name: Run AssembleQa
+        run: ./gradlew app:assembleQa
 
       - name: Upload Artifact APK
         uses: actions/upload-artifact@v2

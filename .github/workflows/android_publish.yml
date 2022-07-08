@@ -7,13 +7,16 @@ on: [ workflow_dispatch ]
     #branches:
       #- 'master'
 
+env:
+  REPO_USERID: ${{ secrets.REPO_USERID }}
+  REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+  LOCAL_PROPERTIES_KEY_PROD: ${{ secrets.LOCAL_PROPERTIES_KEY_PROD }}
+  LOCAL_PROPERTIES_KEY_QA: ${{ secrets.LOCAL_PROPERTIES_KEY_QA }}
+
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -21,20 +24,19 @@ jobs:
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
 
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
+
       - name: Run Lint
-        run: ./gradlew app:lintDebug
+        uses: ./.github/workflows/actions/lint
 
       - name: Upload Lint Test Report
         uses: actions/upload-artifact@v2
         with:
           name: lint_report
           path: app/build/reports/lint-results-debug.html
-
-      - name: Run KtLintCheck
-        run: ./gradlew app:ktlintCheck
-
-      - name: Run Detekt
-        run: ./gradlew app:detekt
 
       - name: Upload Detekt Report
         uses: actions/upload-artifact@v2
@@ -46,15 +48,20 @@ jobs:
     name: Code Analysis
     needs: [ lint ]
     runs-on: ubuntu-latest
-    env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
+
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
+
+      - name: Run Lint
+        uses: ./.github/workflows/actions/lint
 
       - name: Run Tests
         run: ./gradlew app:testDebugUnitTest
@@ -87,9 +94,7 @@ jobs:
     needs: [ code-analysis ]
     runs-on: ubuntu-latest
     env:
-      REPO_USERID: ${{ secrets.REPO_USERID }}
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-      SIGNING_KEY_ALIAS_MOVIEOH: ${{ secrets.SIGNING_KEY_ALIAS_MOVIEOH }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
       SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
       SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
     steps:
@@ -98,6 +103,11 @@ jobs:
 
       - name: Configure Step
         uses: ./.github/workflows/actions/configure
+
+      - name: Set LocalProperties
+        run: |
+          echo KEY_PROD=$LOCAL_PROPERTIES_KEY_PROD >> local.properties
+          echo KEY_QA=$LOCAL_PROPERTIES_KEY_QA >> local.properties
 
       - name: Signing App Release
         run: |
@@ -119,9 +129,9 @@ jobs:
       - name: Create Tag Release
         run: |
           currentVersion=`grep versionName ./buildSrc/src/main/kotlin/ConfigureApp.kt | awk -F" " '{ print $5 }' `
-          currentFormattedVersion=`echo $currentVersion | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-          echo "Version: $currentFormattedVersion"
-          git tag $currentFormattedVersion
+          versionFormatted=`echo $currentVersion | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+          echo "Version: $versionFormatted"
+          git tag $versionFormatted
           git push origin --tags
 
       - name: Deploy to Alpha
@@ -129,6 +139,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SIGNING_SERVICE_ACCOUNT }}
           #TODO change for your packageName
-          packageName: com.hacybeyker.movieoh
+          packageName: com.your.package
           releaseFiles: ./app/build/outputs/bundle/release/app-release.aab
           track: alpha

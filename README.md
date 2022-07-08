@@ -4,11 +4,18 @@ Description for project.
 
 ## Setup
 
-Run the following git commands
+1. Run the following git commands.
 
 ```bash
 git submodule init
 git submodule update
+```
+
+2. Add variables in `local.properties`.
+
+```bash
+   KEY_PROD=YOUR_KEY  
+   KEY_QA=YOUR_KEY
 ```
 
 ## Tools
@@ -31,20 +38,17 @@ git submodule update
 - Github Actions
 - SonarCloud
 
-
 ## Service
 - [Google Play]()
 - [Github Actions]()
 - [SonarCloud]()
 - [MAD]()
 
-
 ## Apis
 
 For this project was used api ...
 
 ## Images
-
 
 
 ## License
