@@ -43,7 +43,7 @@ android {
     }
 
     signingConfigs {
-        //TODO change to your app name
+        // TODO change to your app name
         create("release") {
             keyAlias = findProperty("SIGNING_KEY_ALIAS_YOUR") as String?
                 ?: System.getenv("SIGNING_KEY_ALIAS")

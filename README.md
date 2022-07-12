@@ -14,8 +14,8 @@ git submodule update
 2. Add variables in `local.properties`.
 
 ```bash
-   KEY_PROD=YOUR_KEY  
-   KEY_QA=YOUR_KEY
+KEY_PROD=YOUR_KEY  
+KEY_QA=YOUR_KEY
 ```
 
 ## Tools
